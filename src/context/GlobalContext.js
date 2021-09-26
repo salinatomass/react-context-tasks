@@ -1,9 +1,9 @@
-import { createContext, useContext, useReducer } from "react";
-import { appReducer, intialState } from "./appReducer";
+import { createContext, useContext, useEffect, useReducer } from "react";
+import { appReducer, initializer, initialState } from "./appReducer";
 import { appActions } from "./appActions";
 import { v4 as uuid } from "uuid";
 
-const GlobalContext = createContext(intialState);
+const GlobalContext = createContext(initialState);
 
 export const useAppContext = () => {
   const context = useContext(GlobalContext);
@@ -13,7 +13,11 @@ export const useAppContext = () => {
 };
 
 export const ContextProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(appReducer, intialState);
+  const [state, dispatch] = useReducer(appReducer, initialState, initializer);
+
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(state));
+  }, [state]);
 
   const addTask = (task) =>
     dispatch({ type: appActions.ADD_TASK, payload: { ...task, id: uuid() } });
@@ -24,13 +28,10 @@ export const ContextProvider = ({ children }) => {
   const updateTask = (task) =>
     dispatch({ type: appActions.UPDATE_TASK, payload: task });
 
-  const deleteTasks = () => {
-    dispatch({ type: appActions.DELETE_TASKS });
-  };
+  const deleteTasks = () => dispatch({ type: appActions.DELETE_TASKS });
 
-  const toggleTaskDone = (id) => {
+  const toggleTaskDone = (id) =>
     dispatch({ type: appActions.TOGGLE_TASK_DONE, payload: id });
-  };
 
   return (
     <GlobalContext.Provider

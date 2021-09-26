@@ -1,8 +1,11 @@
 import { appActions } from "./appActions";
 
-export const intialState = {
+export const initialState = {
   tasks: [],
 };
+
+export const initializer = (initialAppState = initialState) =>
+  JSON.parse(localStorage.getItem("tasks")) || initialAppState;
 
 export const appReducer = (state, action) => {
   const { type, payload } = action;
